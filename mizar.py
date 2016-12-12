@@ -1,4 +1,7 @@
-import argparse, itertools, os, re
+import argparse
+import itertools
+import os
+import re
 
 # Function that parses the given strings.xml to extract the KEY-VALUE pairings
 # Notice that it CANNOT ensure that the file you provide be genuine
@@ -8,10 +11,10 @@ def populate_dictionary(xml_path):
 	dictionary = {}
 	
 	try:
-		with open(xml_path, "r", encoding = "utf-8") as file:
-			if not file.readline().startswith("<?xml version=\"1.0\""):
-				raise BaseException("%s: not a XML file" %xml_path)
+		if not xml_path.endswith(".xml"):
+			raise BaseException("%s: not a XML file" %xml_path)
 			
+		with open(xml_path, "r", encoding = "utf-8") as file:
 			for i in file.readlines():
 				if "<string name" in i:
 					dictionary[re.findall("<string name=\"(.*)\">", i)[0]] = re.findall(">(.*)</string>$", i)[0]
@@ -153,17 +156,25 @@ def finalize(final_guide_path, not_replaced):
 	
 	print("[ INFO ] Guide generated at %s. Goodbye." %final_guide_path)
 
-parser = argparse.ArgumentParser(description = "Assembles a MarkDown guide from a collection of MD files and one XML file. The guide will be located where the parts reside.")
-parser.add_argument("xml", type = str, help = "path to the xml file (single file)")
-parser.add_argument("parts", type = str, help = "path to the guide parts (directory)")
-parser.add_argument("guide", type = str, nargs = "?", default = "manual.md", help = "name of the unified guide to be generated")
-args = parser.parse_args()
+###############
+# Main body
 
-raw_keywords_dictionary = populate_dictionary(args.xml)
-keywords_dictionary = purge_dictionary(raw_keywords_dictionary)
-guide_parts = scan_for_guide_parts(args.parts)
-contents = read_file_contents(guide_parts)
-keywords = collect_keywords(contents)
-(reworked_contents, ignored_keywords) = replace_keywords(keywords, keywords_dictionary, contents)
-unified_guide_path = create_unified_guide(reworked_contents, args.parts, args.guide)
-finalize(unified_guide_path, ignored_keywords)
+_parser = argparse.ArgumentParser(description = "Assembles a MarkDown guide from a collection of MD files and one XML file. The guide will be located where the parts reside, or at the chosen location.")
+_parser.add_argument("xml", type = str, help = "path to the xml file (single file)")
+_parser.add_argument("parts", type = str, help = "path to the guide parts (directory)")
+_parser.add_argument("guide", type = str, nargs = "?", default = "manual.md", help = "name and/or full path of the unified guide to be generated")
+_args = _parser.parse_args()
+
+_raw_keywords_dictionary = populate_dictionary(_args.xml)
+_keywords_dictionary = purge_dictionary(_raw_keywords_dictionary)
+_guide_parts = scan_for_guide_parts(_args.parts)
+_contents = read_file_contents(_guide_parts)
+_keywords = collect_keywords(_contents)
+(_reworked_contents, _ignored_keywords) = replace_keywords(_keywords, _keywords_dictionary, _contents)
+
+if os.path.dirname(_args.guide):
+	_unified_guide_path = create_unified_guide(_reworked_contents, os.path.dirname(_args.guide), os.path.basename(_args.guide))
+else:
+	_unified_guide_path = create_unified_guide(_reworked_contents, _args.parts, _args.guide)
+
+finalize(_unified_guide_path, _ignored_keywords)

@@ -16,12 +16,12 @@ Such an input will yield you:
 
     usage: mizar.py [-h] xml parts [guide]
     
-    Assembles a MarkDown guide from a collection of MD files and one XML file. The guide will be located where the parts reside.
+    Assembles a MarkDown guide from a collection of MD files and one XML file. The guide will be located where the parts reside, or at the chosen location.
     
     positional arguments:
       xml         path to the xml file (single file)
       parts       path to the guide parts (directory)
-      guide       name of the unified guide to be generated
+      guide       name and/or full path of the unified guide to be generated
     
     optional arguments:
       -h, --help  show this help message and exit
@@ -32,11 +32,7 @@ While the `xml` and `parts` arguments are self-explanatory, `guide` might be sli
 
 ## Accepted file names and format
 
-At the present moment, Mizar does filter out XML files according to their usual header:
-
-    <?xml version="1.0" encoding="utf-8"?>
-
-As XML files might lack this header, though, I'll probably make the check less strict in a near future.
+At the present moment, Mizar does filter out XML files according to the `.xml` extension.
 
 About guide parts, Mizar won't care whether you assign them the `.md` extension or not. It will search for any file in the given folder whose name begins with an arbitrary number of digits followed by an underscore, such as:
 
@@ -48,7 +44,11 @@ It will be your care to name your guide parts appropriately. The files will be s
 
 ## Output location
 
-The unified guide will always be located in the same folder as the guide parts. Its name shall be the one defined by you as the third argument, or `manual.md` if no name has been specified.
+**If a path and a filename have been provided:** the guode will be located in the chosen path, under the chosen filename.
+
+**If only a filename has been provided:** the guide will be located in the same folder as the guide parts, under the chosen filename.
+
+**If neither a path nor a filename have been provided:** the guide will be located in the same folder as the guide parts, under the `manual.md` filename.
 
 -----
 
@@ -101,4 +101,4 @@ as well.
 
 ## Unsuccessful substitutions
 
-If Mizar finds one or more `{keywords}` which have no matches into the given `strings.xml`, it won't abort abruptly. Instead, it'll report the keywords in question in the shell, and such keywords will be written verbatim in the unified guide.
+If Mizar finds one or more `{keywords}` without matches into the given `strings.xml`, it won't abort abruptly. Instead, it'll report the keywords in question in the shell, and such keywords will be written verbatim in the unified guide.
