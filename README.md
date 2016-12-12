@@ -70,7 +70,7 @@ you'll be able to get the `File Manager` string in your MarkDown guide by writin
 
 where you want that string to appear. This syntax is fully compatible with any other MD syntax. For instance, if you wanted the above string to be bold, you used:
 
-    **{fm}\**
+    **{fm}**
 
 to get **File Manager** in your unified guide.
 
